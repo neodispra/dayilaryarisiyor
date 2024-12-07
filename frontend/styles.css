@@ -1,0 +1,29 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+h1, h2 {
+    font-weight: bold;
+}
+
+#app {
+    max-width: 600px;
+    margin: auto;
+}
+
+#answers button {
+    font-size: 1.2rem;
+}
+
+.list-group-item {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+body {
+    background-image: url('dene.png'); /* PNG dosyasının yolu */
+    background-size: cover; /* Tüm ekranı kapla */
+    background-repeat: no-repeat; /* Resmin tekrarlanmasını engelle */
+    
+    margin: 0; /* Sayfanın kenar boşluklarını kaldır */
+    font-family: Arial, sans-serif; /* Yazı tipini düzenle (isteğe bağlı) */
+}

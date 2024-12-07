@@ -1,0 +1,93 @@
+const API_URL = "http://localhost:3000/scores";
+
+let username = "";
+let score = 0;
+let currentQuestionIndex = 0;
+
+const questions = [
+    { question: "Türk bayrağının rengi nedir?", answers: ["Mavi", "Kırmızı", "Yeşil"], correct: 1 },
+    { question: "Güneş doğudan mı batar?", answers: ["Evet", "Hayır"], correct: 1 },
+    { question: "1+1 kaç eder?", answers: ["3", "4", "2"], correct: 2 },
+];
+
+const nameScreen = document.getElementById("name-screen");
+const quizScreen = document.getElementById("quiz-screen");
+const resultScreen = document.getElementById("result-screen");
+const usernameInput = document.getElementById("username");
+const startButton = document.getElementById("start-button");
+const questionText = document.getElementById("question-text");
+const answersDiv = document.getElementById("answers");
+const finalScore = document.getElementById("final-score");
+const leaderboardList = document.getElementById("leaderboard");
+const restartButton = document.getElementById("restart-button");
+
+startButton.addEventListener("click", () => {
+    username = usernameInput.value.trim();
+    if (username) {
+        nameScreen.style.display = "none";
+        quizScreen.style.display = "block";
+        loadQuestion();
+    } else {
+        alert("Lütfen adınızı girin.");
+    }
+});
+
+function loadQuestion() {
+    const question = questions[currentQuestionIndex];
+    questionText.textContent = question.question;
+    answersDiv.innerHTML = "";
+
+    question.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.classList.add("btn", "btn-outline-primary", "mb-2");
+        button.textContent = answer;
+        button.addEventListener("click", () => checkAnswer(index));
+        answersDiv.appendChild(button);
+    });
+}
+
+function checkAnswer(selectedIndex) {
+    const correctIndex = questions[currentQuestionIndex].correct;
+    if (selectedIndex !== correctIndex) {
+        score += 10;
+    }
+
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+    } else {
+        endGame();
+    }
+}
+
+async function endGame() {
+    quizScreen.style.display = "none";
+    resultScreen.style.display = "block";
+    finalScore.textContent = `${username}, puanın: ${score}`;
+
+    await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: username, score }),
+    });
+
+    updateLeaderboard();
+}
+
+async function updateLeaderboard() {
+    const response = await fetch(API_URL);
+    const leaderboard = await response.json();
+
+    leaderboardList.innerHTML = leaderboard
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => `<li class="list-group-item">${entry.name}: ${entry.score}</li>`)
+        .join("");
+}
+
+restartButton.addEventListener("click", () => {
+    currentQuestionIndex = 0;
+    score = 0;
+    nameScreen.style.display = "block";
+    resultScreen.style.display = "none";
+});
+
